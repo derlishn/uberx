@@ -1,4 +1,4 @@
-package com.derlishn.uberx.feature.auth.signin
+package com.derlishn.uberx.feature.auth.signup
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -29,34 +29,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.derlishn.uberx.R
 
 @Composable
-fun SignInScreen(navController: NavController) {
-
-    val viewModel: SignInViewModel = hiltViewModel()
+fun SignUpScreen(navController: NavController) {
+    val viewModel: SignUpViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
+    var name by remember {
+        mutableStateOf("")
+    }
     var email by remember {
         mutableStateOf("")
     }
     var password by remember {
         mutableStateOf("")
     }
-
+    var confirm by remember {
+        mutableStateOf("")
+    }
     val context = LocalContext.current
     LaunchedEffect(key1 = uiState.value) {
 
         when (uiState.value) {
-            is SignInState.Success -> {
+            is SignUpState.Success -> {
                 navController.navigate("home")
             }
 
-            is SignInState.Error -> {
+            is SignUpState.Error -> {
                 Toast.makeText(context, "Sign In failed", Toast.LENGTH_SHORT).show()
             }
 
@@ -70,8 +72,7 @@ fun SignInScreen(navController: NavController) {
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(it)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(16.dp), verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -81,40 +82,45 @@ fun SignInScreen(navController: NavController) {
                     .size(200.dp)
                     .background(Color.White)
             )
+            OutlinedTextField(value = name,
+                onValueChange = { name = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Full Name") })
+
             OutlinedTextField(value = email,
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Email") })
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = password, onValueChange = { password = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Password") },
                 visualTransformation = PasswordVisualTransformation()
             )
+            OutlinedTextField(
+                value = confirm, onValueChange = { confirm = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Confirm Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                isError = password.isNotEmpty() && confirm.isNotEmpty() && password != confirm
+            )
             Spacer(modifier = Modifier.size(16.dp))
-
-            if (uiState.value == SignInState.Loading) {
+            if (uiState.value == SignUpState.Loading) {
                 CircularProgressIndicator()
             } else {
                 Button(
-                    onClick = { viewModel.signIn(email, password) },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = email.isNotEmpty() && password.isNotEmpty() && (uiState.value == SignInState.Nothing || uiState.value == SignInState.Error)
+                    onClick = {
+                        viewModel.signUp(name, email, password)
+                    }, modifier = Modifier.fillMaxWidth(),
+                    enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirm.isNotEmpty() && password == confirm
                 ) {
-                    Text(text = "Sign In")
+                    Text(text = "Sign Up")
                 }
-
-                TextButton(onClick = { navController.navigate("signup") }) {
-                    Text(text = "Don't have an account? Sign Up")
+                TextButton(onClick = { navController.popBackStack() }) {
+                    Text(text = "Already have an account? Sign In")
                 }
             }
+
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSignInScreen() {
-    SignInScreen(navController = rememberNavController())
 }
