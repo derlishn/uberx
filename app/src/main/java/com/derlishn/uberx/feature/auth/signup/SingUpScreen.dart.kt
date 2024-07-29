@@ -3,41 +3,36 @@ package com.derlishn.uberx.feature.auth.signup
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.derlishn.uberx.R
+import com.derlishn.uberx.ui.theme.*
 
 @Composable
 fun SignUpScreen(navController: NavController) {
+
     val viewModel: SignUpViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
+
     var name by remember {
         mutableStateOf("")
     }
@@ -50,6 +45,10 @@ fun SignUpScreen(navController: NavController) {
     var confirm by remember {
         mutableStateOf("")
     }
+    var passwordVisible by remember {
+        mutableStateOf(false)
+    }
+
     val context = LocalContext.current
     LaunchedEffect(key1 = uiState.value) {
 
@@ -59,7 +58,7 @@ fun SignUpScreen(navController: NavController) {
             }
 
             is SignUpState.Error -> {
-                Toast.makeText(context, "Sign In failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Sign Up failed", Toast.LENGTH_SHORT).show()
             }
 
             else -> {}
@@ -70,9 +69,10 @@ fun SignUpScreen(navController: NavController) {
         Column(
             Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(DarkBackgroundColor)
                 .padding(it)
-                .padding(16.dp), verticalArrangement = Arrangement.Center,
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -80,29 +80,111 @@ fun SignUpScreen(navController: NavController) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(200.dp)
-                    .background(Color.White)
+                    .background(DarkBackgroundColor)
             )
-            OutlinedTextField(value = name,
+            Spacer(modifier = Modifier.size(16.dp))
+            Text(
+                text = "Welcome",
+                style = TextStyle(
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = "Create your account",
+                style = TextStyle(
+                    color = Color.Gray,
+                    fontSize = 16.sp
+                )
+            )
+            OutlinedTextField(
+                value = name,
                 onValueChange = { name = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = "Full Name") })
-
-            OutlinedTextField(value = email,
+                label = { Text(text = "Full Name") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = FocusedBorderColor,
+                    unfocusedBorderColor = UnfocusedBorderColor,
+                    focusedLabelColor = LabelColor,
+                    unfocusedLabelColor = LabelColor,
+                    cursorColor = CursorColor,
+                    disabledLabelColor = UnfocusedBorderColor
+                ),
+                textStyle = TextStyle(TextColor)
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            OutlinedTextField(
+                value = email,
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = "Email") })
+                label = { Text(text = "Email") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = FocusedBorderColor,
+                    unfocusedBorderColor = UnfocusedBorderColor,
+                    focusedLabelColor = LabelColor,
+                    unfocusedLabelColor = LabelColor,
+                    cursorColor = CursorColor,
+                    disabledLabelColor = UnfocusedBorderColor
+                ),
+                textStyle = TextStyle(TextColor)
+            )
+            Spacer(modifier = Modifier.size(16.dp))
             OutlinedTextField(
-                value = password, onValueChange = { password = it },
+                value = password,
+                onValueChange = { password = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Password") },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else
+                        Icons.Filled.VisibilityOff
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(imageVector = image, contentDescription = null)
+                    }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = FocusedBorderColor,
+                    unfocusedBorderColor = UnfocusedBorderColor,
+                    focusedLabelColor = LabelColor,
+                    unfocusedLabelColor = LabelColor,
+                    cursorColor = CursorColor,
+                    disabledLabelColor = UnfocusedBorderColor
+                ),
+                textStyle = TextStyle(TextColor)
             )
+            Spacer(modifier = Modifier.size(16.dp))
             OutlinedTextField(
-                value = confirm, onValueChange = { confirm = it },
+                value = confirm,
+                onValueChange = { confirm = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Confirm Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                isError = password.isNotEmpty() && confirm.isNotEmpty() && password != confirm
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image = if (passwordVisible)
+                        Icons.Filled.Visibility
+                    else
+                        Icons.Filled.VisibilityOff
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(imageVector = image, contentDescription = null)
+                    }
+                },
+                isError = password.isNotEmpty() && confirm.isNotEmpty() && password != confirm,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = FocusedBorderColor,
+                    unfocusedBorderColor = UnfocusedBorderColor,
+                    focusedLabelColor = LabelColor,
+                    unfocusedLabelColor = LabelColor,
+                    cursorColor = CursorColor,
+                    disabledLabelColor = UnfocusedBorderColor,
+                    errorBorderColor = Color.Red,
+                    errorLabelColor = Color.Red
+                ),
+                textStyle = TextStyle(TextColor)
             )
             Spacer(modifier = Modifier.size(16.dp))
             if (uiState.value == SignUpState.Loading) {
@@ -111,16 +193,38 @@ fun SignUpScreen(navController: NavController) {
                 Button(
                     onClick = {
                         viewModel.signUp(name, email, password)
-                    }, modifier = Modifier.fillMaxWidth(),
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ButtonEnabledColor,
+                        disabledContainerColor = ButtonDisabledColor
+                    ),
                     enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirm.isNotEmpty() && password == confirm
                 ) {
-                    Text(text = "Sign Up")
+                    Text(text = "Sign Up", color = ButtonTextColor)
                 }
-                TextButton(onClick = { navController.popBackStack() }) {
-                    Text(text = "Already have an account? Sign In")
+                Spacer(modifier = Modifier.size(32.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Already have an account?",
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    TextButton(onClick = { navController.popBackStack() }) {
+                        Text(text = "Sign In", color = Color.White)
+                    }
                 }
             }
-
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewSignUpScreen() {
+    SignUpScreen(navController = rememberNavController())
 }
