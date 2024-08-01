@@ -19,3 +19,6 @@ val TextColor = Color(0xFFD1D1DB)
 val ButtonEnabledColor = Color(0xFF28287C)   // Color del botón habilitado
 val ButtonDisabledColor = Color(0xFF3C3C4D)  // Color del botón deshabilitado
 val ButtonTextColor = Color(0xFFFFFFFF)
+val CardColor = Color(0xFF414360)
+val CardColorSecondary = Color(0xFF60638C)
+val ItemMenuColor = Color(0xFFB466C5)

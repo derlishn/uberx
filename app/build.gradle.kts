@@ -81,4 +81,5 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-storage")
     implementation ("androidx.compose.material:material-icons-extended:1.2.1")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 }
